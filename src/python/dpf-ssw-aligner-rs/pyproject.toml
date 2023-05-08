@@ -27,4 +27,5 @@ dev = ["pytest>=6.0", "twine"]
 profile = "black"
 
 [tool.cibuildwheel]
+test-requires = "pytest"
 test-command = "pytest {package}/tests"
