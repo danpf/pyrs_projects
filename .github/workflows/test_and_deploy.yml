@@ -22,7 +22,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, windows-2019, macos-11]
         project_folder: ["./src/python/dpf-ssw-aligner-rs"]
-        python-version: ['cp310', 'pp37', 'pp38', 'pp39']
+        python-version: ['cp310', 'cp311']
     runs-on: ${{ matrix.os }}
     env:
       CIBW_ENVIRONMENT: 'PATH="$PATH:$HOME/.cargo/bin"'
