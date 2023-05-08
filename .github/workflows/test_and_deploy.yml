@@ -7,6 +7,9 @@ on:
   release:
     types:
     - published
+  push:
+    branches:
+      - master
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -23,11 +26,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
 
       # QEMU enables building/testing for non-native architectures (ie arm64)
       # at the cost of speed
@@ -36,6 +34,15 @@ jobs:
         uses: docker/setup-qemu-action@v2
         with:
           platforms: all
+
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
+      - name: does cargo exist?
+        run: which cargo && cargo --help
 
       - name: Build & test wheels
         uses: pypa/cibuildwheel@v2.12.3
