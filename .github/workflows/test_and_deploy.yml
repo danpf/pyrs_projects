@@ -42,7 +42,7 @@ jobs:
           override: true
 
       - name: does cargo exist?
-        run: which cargo && cargo --help
+        run: which cargo && cargo --help && echo $PATH
 
       - name: Build & test wheels
         uses: pypa/cibuildwheel@v2.12.3
