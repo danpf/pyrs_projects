@@ -1,0 +1,10 @@
+[package]
+name = "dpf-ssw-aligner-rs"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+name = "dpf_ssw_aligner_rs"
+
+# "cdylib" is necessary to produce a shared library for Python to import from.
+crate-type = ["cdylib", "rlib"]

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["maturin>=0.13,<0.14"]
+build-backend = "maturin"
+
+[project]
+name = "dpf_ssw_aligner_rspy"
+authors = [{name = "Danny Farrell", email = "danpf@uw.edu"}]
+version = "1.0.0"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Rust",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS :: MacOS X",
+]
+
+[project.scripts]
+ssw-align = "dpf_ssw_aligner_rspy.commandline_entrypoints:cmdline_wrapper"
+
+[project.optional-dependencies]
+dev = ["pytest>=6.0", "twine"]
+
+[tool.isort]
+profile = "black"
