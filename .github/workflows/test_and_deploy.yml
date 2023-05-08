@@ -15,7 +15,6 @@ concurrency:
 jobs:
   test-and-build:
     name: "Build & Test"
-    needs: "generate-wheels-matrix"
     strategy:
       matrix:
         os: [ubuntu-20.04, windows-2019, macos-11]
