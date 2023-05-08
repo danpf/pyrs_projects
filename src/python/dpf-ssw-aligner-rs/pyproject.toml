@@ -25,3 +25,6 @@ dev = ["pytest>=6.0", "twine"]
 
 [tool.isort]
 profile = "black"
+
+[tool.cibuildwheel]
+test-command = "pytest {package}/tests"
