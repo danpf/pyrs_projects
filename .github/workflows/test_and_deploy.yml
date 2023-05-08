@@ -23,6 +23,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
 
       # QEMU enables building/testing for non-native architectures (ie arm64)
       # at the cost of speed
