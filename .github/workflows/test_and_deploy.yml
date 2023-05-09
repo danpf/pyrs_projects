@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-and-build:
-    name: "Build & Test"
+  test-and-build-dpf-ssw-aligner:
+    name: "Build & Test dpf-ssw-aligner-pyrs"
     strategy:
       matrix:
         os: [ubuntu-20.04, windows-2019, macos-11]
@@ -42,10 +42,7 @@ jobs:
       - name: Install latest nightly
         uses: dtolnay/rust-toolchain@nightly
 
-      - name: does cargo exist?
-        run: which cargo && cargo --help && echo $PATH
-
-      - name: Build & test wheels
+      - name: Build & test wheels dpf-ssw-aligner-rs wheels
         uses: pypa/cibuildwheel@v2.12.3
         with:
           package-dir: src/python/dpf-ssw-aligner-rs
@@ -70,3 +67,41 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/dpf_ssw_aligner*.whl
+
+  test-and-build-dpf-mrcfile:
+    name: "Build & Test dpf-mrcfile"
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, windows-2019, macos-11]
+        project_folder: ["./src/python/dpf-mrcfile"]
+        python-version: ['cp310', 'cp311']
+    runs-on: ${{ matrix.os }}
+    env:
+      CIBW_SKIP: "p*-win* *-win32 *-win_arm64 *-musllinux_*"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # QEMU enables building/testing for non-native architectures (ie arm64)
+      # at the cost of speed
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
+
+      - name: Build & test wheels dpf-ssw-aligner-rs wheels
+        uses: pypa/cibuildwheel@v2.12.3
+        with:
+          package-dir: src/python/dpf-mrcfile
+        env:
+          CIBW_BUILD: '${{ matrix.python-version }}-*'
+          # we build for "alt_arch_name" if it exists, else 'auto'
+          CIBW_ARCHS: ${{ matrix.alt_arch_name || 'auto' }}
+
+      - name: Build sdist
+        run: pipx run build --sdist --outdir wheelhouse src/python/dpf-mrcfile
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/dpf_mrcfile*.whl
