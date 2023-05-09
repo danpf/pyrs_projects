@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CIBW_ENVIRONMENT: 'PATH="$PATH:$HOME/.cargo/bin"'
-      CIBW_SKIP: "cp27-* cp34-* cp35-* pp*-win* *-win32 *-win_arm64 *-musllinux_*"
+      CIBW_SKIP: "p*-win* *-win32 *-win_arm64 *-musllinux_*"
 
     steps:
       - uses: actions/checkout@v3
@@ -40,10 +40,7 @@ jobs:
           platforms: all
 
       - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
+        uses: dtolnay/rust-toolchain@nightly
 
       - name: does cargo exist?
         run: which cargo && cargo --help && echo $PATH
@@ -54,8 +51,6 @@ jobs:
           package-dir: src/python/dpf-ssw-aligner-rs
         env:
           CIBW_BUILD: '${{ matrix.python-version }}-*'
-          # rust doesn't seem to be available for musl linux on i686
-          CIBW_SKIP: '*-musllinux_i686'
           # we build for "alt_arch_name" if it exists, else 'auto'
           CIBW_ARCHS: ${{ matrix.alt_arch_name || 'auto' }}
           CIBW_ENVIRONMENT: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always"'
@@ -69,8 +64,9 @@ jobs:
           # CIBW_TEST_SKIP: '*-macosx_universal2:arm64'
           CIBW_BUILD_VERBOSITY: 1
 
+      - name: Build sdist
+        run: pipx run build --sdist --outdir wheelhouse
 
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/dpf_ssw_aligner*.whl
-
