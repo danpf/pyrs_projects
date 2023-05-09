@@ -65,7 +65,7 @@ jobs:
           CIBW_BUILD_VERBOSITY: 1
 
       - name: Build sdist
-        run: pipx run build --sdist --outdir wheelhouse
+        run: pipx run build --sdist --outdir wheelhouse src/python/dpf-ssw-aligner-rs
 
       - uses: actions/upload-artifact@v3
         with:
