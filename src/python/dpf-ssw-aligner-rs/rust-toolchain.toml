@@ -1,0 +1,3 @@
+[toolchain]
+# required for simd
+channel = "nightly"
