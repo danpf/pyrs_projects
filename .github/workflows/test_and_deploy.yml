@@ -1,7 +1,7 @@
 ---
 name: "CI & CD"
 
-on:
+'on':
   workflow_dispatch:
   pull_request:
   release:
@@ -17,7 +17,11 @@ concurrency:
 
 jobs:
   test-and-build-dpf-ssw-aligner:
-    name: "Build & Test dpf-ssw-aligner-pyrs"
+    name: "Build & Test dpf-ssw-aligner-pyrs on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-12]
 
     steps:
       - uses: actions/checkout@v3
@@ -43,7 +47,11 @@ jobs:
           path: ./wheelhouse/dpf_ssw_aligner*.whl
 
   test-and-build-dpf-mrcfile:
-    name: "Build & Test dpf-mrcfile"
+    name: "Build & Test dpf-mrcfile on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-12]
 
     steps:
       - uses: actions/checkout@v3
