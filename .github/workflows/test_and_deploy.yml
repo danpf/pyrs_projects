@@ -40,7 +40,7 @@ jobs:
           python-version: "3.12"
 
       - name: Build, Test, and Upload dpf-ssw-aligner-rs
-        run: python ./mono.py cicd_dpf_ssw_aligner
+        run: python ./mono.py --mode cicd_dpf_ssw_aligner
 
       - uses: actions/upload-artifact@v3
         with:
@@ -62,7 +62,7 @@ jobs:
           python-version: "3.12"
 
       - name: Build, Test, and Upload dpf-mrcfile
-        run: python ./mono.py cicd_dpf_ssw_aligner
+        run: python ./mono.py --mode cicd_dpf_ssw_aligner
 
       - uses: actions/upload-artifact@v3
         if: runner.os == 'Linux'
