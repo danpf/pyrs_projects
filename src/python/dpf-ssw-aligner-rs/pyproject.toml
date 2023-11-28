@@ -1,10 +1,8 @@
-[build-system]
-requires = ["maturin>=0.13,<0.14"]
-build-backend = "maturin"
-
 [project]
 name = "dpf_ssw_aligner_rspy"
-authors = [{name = "Danny Farrell", email = "danpf@uw.edu"}]
+authors = [
+  { name = "Danny Farrell", email = "16297104+danpf@users.noreply.github.com" },
+]
 version = "1.0.0"
 requires-python = ">=3.10"
 classifiers = [
@@ -14,18 +12,63 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Rust",
     "Operating System :: POSIX",
-    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
+
+[build-system]
+requires = ["maturin>=1,<2"]
+build-backend = "maturin"
+
+[tool.maturin]
+python-source = "src"
+module-name = "dpf_ssw_aligner_rspy._rs_bind"
 
 [project.scripts]
 ssw-align = "dpf_ssw_aligner_rspy.commandline_entrypoints:cmdline_wrapper"
 
 [project.optional-dependencies]
-dev = ["pytest>=6.0", "twine"]
-
-[tool.isort]
-profile = "black"
+dev = ["twine"]
 
 [tool.cibuildwheel]
-test-requires = "pytest"
-test-command = "pytest {package}/test"
+test-command = "python {package}/test/test_align.py"
+test-skip = ["*universal2:arm64"]
+skip = "*-win32 *-win_arm64 pp*win* *musllinux*"
+
+[tool.ruff]
+src = ["src/dpf_ssw_aligner_rspy"]
+
+[tool.ruff.lint]
+extend-select = [
+  "B",      # flake8-bugbear
+  "I",      # isort
+  "ARG",    # flake8-unused-arguments
+  "C4",     # flake8-comprehensions
+  "EM",     # flake8-errmsg
+  "ICN",    # flake8-import-conventions
+  "G",      # flake8-logging-format
+  "PGH",    # pygrep-hooks
+  "PIE",    # flake8-pie
+  "PL",     # pylint
+  "PTH",    # flake8-use-pathlib
+  "RET",    # flake8-return
+  "RUF",    # Ruff-specific
+  "SIM",    # flake8-simplify
+  "T20",    # flake8-print
+  "UP",     # pyupgrade
+  "YTT",    # flake8-2020
+  "EXE",    # flake8-executable
+  "NPY",    # NumPy specific rules
+  "PD",     # pandas-vet
+]
+ignore = [
+  "PLR",    # Design related pylint codes
+  "PT",     # flake8-pytest-style
+]
+isort.required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.per-file-ignores]
+"test/**" = ["T20"]
+

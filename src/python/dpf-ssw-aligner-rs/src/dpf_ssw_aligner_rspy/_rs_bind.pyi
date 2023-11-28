@@ -16,7 +16,9 @@ class PyAlign:
     def get_flag(self) -> int: ...
 
 class PyProfile:
-    def __init__(self, read: list[int], read_len: int, mat: list[int], n: int, score_size: int) -> None: ...
+    def __init__(
+        self, read: list[int], read_len: int, mat: list[int], n: int, score_size: int
+    ) -> None: ...
 
 def py_ssw_align(
     prof: PyProfile,

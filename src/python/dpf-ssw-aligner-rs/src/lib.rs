@@ -107,6 +107,7 @@ pub fn py_ssw_align(
 
 /// This module is implemented in Rust.
 #[pymodule]
+#[pyo3(name="_rs_bind")]
 fn dpf_ssw_aligner_rspy(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyCigar>()?;
     m.add_class::<PyAlign>()?;

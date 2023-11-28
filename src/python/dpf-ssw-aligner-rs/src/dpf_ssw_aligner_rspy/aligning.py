@@ -1,16 +1,16 @@
+from __future__ import annotations
+
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
 
-from .file_io import read_matrix, read_fasta_and_fastq_files
-from .builtin_matrices import build_default_matrices
-from .tracing import TraceResult
-from .dpf_ssw_aligner_rspy import (
-    PyCigar as PyCigar,
-    py_ssw_align as py_ssw_align,
-    PyAlign as PyAlign,
-    PyProfile as PyProfile,
+from ._rs_bind import (
+    PyProfile,
+    py_ssw_align,
 )
+from .builtin_matrices import build_default_matrices
+from .file_io import read_fasta_and_fastq_files, read_matrix
+from .tracing import TraceResult
 
 
 @dataclass
@@ -51,7 +51,7 @@ class SSWSeq:
         element_to_int: dict[str, int],
         reverse_complement_map: dict[str, str],
         mat: list[int],
-    ) -> "SSWSeq":
+    ) -> SSWSeq:
         int_seq = seq_to_int_representation(seq, elements, element_to_int)
         profile = PyProfile(int_seq, len(int_seq), mat, len(elements), 2)
 
@@ -83,14 +83,18 @@ class SSWSeq:
 
     def reverse_complement(self) -> None:
         if self.is_protein:
-            raise RuntimeError("Reverse complement alignment is not available for protein sequences.")
+            raise RuntimeError(
+                "Reverse complement alignment is not available for protein sequences."
+            )
         self.seq, self.rc_seq = self.rc_seq, self.seq
         self.int_seq, self.rc_int_seq = self.rc_int_seq, self.int_seq
         self.quality, self.rc_quality = self.rc_quality, self.quality
         self.is_rc = not self.is_rc
 
 
-def seq_to_int_representation(seq: str, lEle: list[str], dEle2Int: dict[str, int]) -> list[int]:
+def seq_to_int_representation(
+    seq: str, lEle: list[str], dEle2Int: dict[str, int]
+) -> list[int]:
     """
     translate a sequence into numbers
     @param  seq   a sequence
@@ -109,7 +113,13 @@ def seq_to_int_representation(seq: str, lEle: list[str], dEle2Int: dict[str, int
 
 
 def align_one(
-    query: SSWSeq, target: SSWSeq, gap_open_penalty: int, gap_extension_penalty: int, flag: int, mask_len: int, rc: bool
+    query: SSWSeq,
+    target: SSWSeq,
+    gap_open_penalty: int,
+    gap_extension_penalty: int,
+    flag: int,
+    mask_len: int,
+    rc: bool,
 ) -> AlignResult:
     """
     return (nScore, nScore2, nRefBeg, nRefEnd, nQryBeg, nQryEnd, nRefEnd2, nCigarLen, lCigar)
@@ -197,15 +207,30 @@ class Aligner:
                     else:
                         self.mat[i * len(self.elements) + j] -= self.mismatch_score
         else:
-            self.elements, self.element_to_int, self.int_to_element, self.mat = read_matrix(Path(self.matrix_file))
+            (
+                self.elements,
+                self.element_to_int,
+                self.int_to_element,
+                self.mat,
+            ) = read_matrix(Path(self.matrix_file))
 
     def _set_aa_params(self):
         # load AA score matrix
         if not self.matrix_file:
-            self.elements, self.element_to_int, self.int_to_element, self.mat = build_default_matrices(self.matrix)
+            (
+                self.elements,
+                self.element_to_int,
+                self.int_to_element,
+                self.mat,
+            ) = build_default_matrices(self.matrix)
         else:
             # assume the format of the input score matrix is the same as that of http://www.ncbi.nlm.nih.gov/Class/FieldGuide/BLOSUM62.txt
-            self.elements, self.element_to_int, self.int_to_element, self.mat = read_matrix(Path(self.matrix_file))
+            (
+                self.elements,
+                self.element_to_int,
+                self.int_to_element,
+                self.mat,
+            ) = read_matrix(Path(self.matrix_file))
 
     def _set_params_from_matrices(self):
         self.reverse_complement_map = {}
@@ -219,14 +244,32 @@ class Aligner:
         assert self.match_score >= 0
         assert self.mismatch_score >= 0
         if self.try_rc_and_use_best and self.is_protein:
-            raise RuntimeError("Reverse complement alignment is not available for protein sequences.")
+            raise RuntimeError(
+                "Reverse complement alignment is not available for protein sequences."
+            )
 
-    def _align_and_build_traceback(self, target: SSWSeq, query: SSWSeq, mask_len: int) -> TraceResult:
-        res = align_one(query, target, self.gap_open_penalty, self.gap_extension_penalty, self.flag, mask_len, False)
+    def _align_and_build_traceback(
+        self, target: SSWSeq, query: SSWSeq, mask_len: int
+    ) -> TraceResult:
+        res = align_one(
+            query,
+            target,
+            self.gap_open_penalty,
+            self.gap_extension_penalty,
+            self.flag,
+            mask_len,
+            False,
+        )
         rc_res = None
         if self.try_rc_and_use_best:
             rc_res = align_one(
-                query, target, self.gap_open_penalty, self.gap_extension_penalty, self.flag, mask_len, True
+                query,
+                target,
+                self.gap_open_penalty,
+                self.gap_extension_penalty,
+                self.flag,
+                mask_len,
+                True,
             )
 
         if rc_res is None or res.score1 > rc_res.score2:
@@ -244,7 +287,7 @@ class Aligner:
         return trace_result
 
     def run_from_sequences(
-        self, query_seqs: list[tuple[str, str]], target_seqs: list[tuple[str, str]]
+        self, query_seqs: Sequence[tuple[str, str]], target_seqs: Sequence[tuple[str, str]]
     ) -> Iterator[TraceResult]:
         for _query_id, _query_seq in query_seqs:
             query_sswseq = SSWSeq.build_seq(
@@ -269,10 +312,16 @@ class Aligner:
                     reverse_complement_map=self.reverse_complement_map,
                     mat=self.mat,
                 )
-                yield self._align_and_build_traceback(target_sswseq, query_sswseq, mask_len)
+                yield self._align_and_build_traceback(
+                    target_sswseq, query_sswseq, mask_len
+                )
 
-    def run_from_files(self, query_file: str, target_file: str) -> Iterator[TraceResult]:
-        for _query_id, _query_seq, _query_quality in read_fasta_and_fastq_files(Path(query_file)):
+    def run_from_files(
+        self, query_file: str, target_file: str
+    ) -> Iterator[TraceResult]:
+        for _query_id, _query_seq, _query_quality in read_fasta_and_fastq_files(
+            Path(query_file)
+        ):
             query_sswseq = SSWSeq.build_seq(
                 self.is_protein,
                 id_=_query_id,
@@ -284,7 +333,9 @@ class Aligner:
                 mat=self.mat,
             )
             mask_len = len(query_sswseq.seq) // 2
-            for _target_id, _target_seq, _target_quality in read_fasta_and_fastq_files(Path(target_file)):
+            for _target_id, _target_seq, _target_quality in read_fasta_and_fastq_files(
+                Path(target_file)
+            ):
                 target_sswseq = SSWSeq.build_seq(
                     self.is_protein,
                     id_=_target_id,
@@ -295,4 +346,6 @@ class Aligner:
                     reverse_complement_map=self.reverse_complement_map,
                     mat=self.mat,
                 )
-                yield self._align_and_build_traceback(target_sswseq, query_sswseq, mask_len)
+                yield self._align_and_build_traceback(
+                    target_sswseq, query_sswseq, mask_len
+                )

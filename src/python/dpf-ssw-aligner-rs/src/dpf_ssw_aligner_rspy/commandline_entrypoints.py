@@ -1,11 +1,12 @@
-import sys
-import argparse
-import time
-from typing import Iterator
+from __future__ import annotations
 
-from dpf_ssw_aligner_rspy.tracing import TraceResult
+import argparse
+import sys
+import time
+from collections.abc import Iterator
 
 from .aligning import Aligner
+from .tracing import TraceResult
 
 
 def parse_args(cmdline_args: list[str]):
@@ -44,7 +45,11 @@ def parse_args(cmdline_args: list[str]):
         action="store_true",
         help="Do protein sequence alignment. default is genome alignment",
     )
-    parser.add_argument("--matrix-file", default="", help="a file for either Blosum or Pam weight matrix.")
+    parser.add_argument(
+        "--matrix-file",
+        default="",
+        help="a file for either Blosum or Pam weight matrix.",
+    )
     parser.add_argument(
         "--matrix",
         choices=("BLOSUM62", "BLOSUM50"),
@@ -65,9 +70,7 @@ def parse_args(cmdline_args: list[str]):
     )
     parser.add_argument("-t", "--target", help="target file", required=True)
     parser.add_argument("-q", "--query", help="query file", required=True)
-    args = parser.parse_args(cmdline_args)
-    return args
-
+    return parser.parse_args(cmdline_args)
 
 
 def cmdline_main(cmdline_args: list[str]) -> Iterator[TraceResult]:
@@ -93,6 +96,7 @@ def cmdline_main(cmdline_args: list[str]) -> Iterator[TraceResult]:
         yield r
     t2 = time.time()
     print(f"CPU time: {t2-t1} seconds")
+
 
 def cmdline_wrapper():
     for _ in cmdline_main(sys.argv[1:]):
