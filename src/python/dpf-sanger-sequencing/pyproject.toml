@@ -2,6 +2,6 @@
 name = "dpf_sanger_sequencing"
 description="A library for interpreting sanger sequencing data"
 requires-python = ">=3.11"
-authors = [{name = "Danny Farrell", email = "danpf@uw.edu"}]
+authors = [{name = "Danny Farrell", email = "16297104+danpf@users.noreply.github.com"}]
 dependencies = ["biopython", "requests", "sqlalchemy"]
 version="1.0.0"

@@ -2,7 +2,7 @@
 name = "dpf-mrcfile"
 description="A library for handling scientific volume and image-stack data like from .MAP .MRC .MRCS"
 requires-python = ">=3.10"
-authors = [{name = "Danny Farrell", email = "danpf@uw.edu"}]
+authors = [{name = "Danny Farrell", email = "16297104+danpf@users.noreply.github.com"}]
 dependencies = ["numpy>=1.22"]
 version="1.0.0"
 classifiers = [
