@@ -24,25 +24,25 @@ jobs:
         os: [ubuntu-22.04, windows-2022, macos-12]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # QEMU enables building/testing for non-native architectures (ie arm64)
       # at the cost of speed
       - name: Set up QEMU
         if: runner.os == 'Linux'
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         with:
           platforms: all
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Build, Test, and Upload dpf-ssw-aligner-rs
         run: python ./mono.py --mode cicd_dpf_ssw_aligner_rs
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/dpf_ssw_aligner*.whl
 
@@ -54,17 +54,17 @@ jobs:
         os: [ubuntu-22.04, windows-2022, macos-12]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       # - name: Build, Test, and Upload dpf-mrcfile
       #   run: python ./mono.py --mode cicd_dpf_mrcfile
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: runner.os == 'Linux'
         with:
           path: ./wheelhouse/dpf_mrcfile*.whl
